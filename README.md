@@ -17,7 +17,6 @@ Samarasinghe S.R.G.N. B 	IT24101261
 Created using Spring Boot Framework. 
 -------------------------
 Used Dependencies: 
--------------------------
 Thymeleaf
 , Spring Web
 , Spring Security
