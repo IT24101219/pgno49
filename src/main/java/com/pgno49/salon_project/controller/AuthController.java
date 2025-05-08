@@ -62,7 +62,6 @@ public class AuthController {
             if (e.getMessage() != null) {
                 if (e.getMessage().contains("pending approval")) { return "redirect:/pending-approval"; }
                 if (e.getMessage().contains("rejected")) { return "redirect:/approval-rejected"; }
-
             }
             return "redirect:/login?error";
         }
