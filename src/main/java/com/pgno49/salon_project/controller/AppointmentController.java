@@ -6,7 +6,7 @@ import com.pgno49.salon_project.model.User;
 import com.pgno49.salon_project.service.AppointmentService;
 import com.pgno49.salon_project.service.ServiceService;
 import com.pgno49.salon_project.service.UserService;
-import com.pgno49.salon_project.util.QuickSortUtil;
+import com.pgno49.salon_project.util.QuickSortUtil; 
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,12 +37,13 @@ public class AppointmentController {
         this.userService = userService;
         this.serviceService = serviceService;
     }
-
-    private User getLoggedInUser(HttpSession session) {
+  
+      private User getLoggedInUser(HttpSession session) {
         return (User) session.getAttribute("loggedInUser");
     }
-
-    private boolean hasRole(User user, User.Role... allowedRoles) {
+  
+  
+      private boolean hasRole(User user, User.Role... allowedRoles) {
         if (user == null) return false;
         for (User.Role allowedRole : allowedRoles) {
             if (user.getRole() == allowedRole) return true;
@@ -51,8 +52,8 @@ public class AppointmentController {
         return false;
     }
 
-
-    @GetMapping({"", "/list"})
+  
+      @GetMapping({"", "/list"})
     public String listAppointments(Model model, HttpSession session,
                                    @RequestParam(value = "filter", required = false) String filter) {
         User loggedInUser = getLoggedInUser(session);
@@ -100,8 +101,45 @@ public class AppointmentController {
         }
         return "appointments/appointment-list";
     }
+  
+  
+  @GetMapping("/add")
+    public String showAddAppointmentForm(Model model, HttpSession session) {
+        User loggedInUser = getLoggedInUser(session);
+        if (!hasRole(loggedInUser, User.Role.CUSTOMER, User.Role.STAFF_APPROVED, User.Role.MAIN_ADMIN)) {
+            return (loggedInUser == null) ? "redirect:/login" : "redirect:/access-denied";
+        }
+        model.addAttribute("loggedInUser", loggedInUser);
+        model.addAttribute("currentPage", "appointments");
 
-    //Implement Add Appointments HERE (Other Member)
+        List<Service> services = serviceService.getAllServices();
+        if (services.isEmpty()) {
+            model.addAttribute("errorMessage", "Cannot add appointment: Services are not available.");
+            return "redirect:/appointments?error=no_services";
+        }
+
+        Appointment appointment = new Appointment();
+        List<User> customers;
+        if (hasRole(loggedInUser, User.Role.CUSTOMER)) {
+            appointment.setCustomerId(loggedInUser.getId());
+            customers = List.of(loggedInUser);
+        } else {
+            customers = userService.getAllActiveCustomers();
+        }
+
+        if (customers.isEmpty() && !hasRole(loggedInUser, User.Role.CUSTOMER)){
+            model.addAttribute("errorMessage", "Cannot add appointment: No active customers found.");
+            return "redirect:/appointments?error=no_customers";
+        }
+
+        model.addAttribute("appointment", appointment);
+        model.addAttribute("customers", customers);
+        model.addAttribute("services", services);
+        model.addAttribute("pageTitle", "Book New Appointment");
+        model.addAttribute("allStatuses", Appointment.AppointmentStatus.values());
+
+        return "appointments/appointment-form";
+    }
 
 
     @GetMapping("/edit/{id}")

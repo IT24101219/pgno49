@@ -15,10 +15,45 @@
 <div th:replace="~{fragments/_navbar :: navbar}"></div>
 
 <div class="container form-container">
+    <h1 class="mb-4" th:text="${pageTitle ?: 'Appointment Form'}">Appointment Form</h1>
+
+    <div th:if="${#fields.hasErrors('${appointment.*}')}" class="alert alert-danger">Please correct the errors below.</div>
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}">Error!</div>
 
 
+    <form th:action="@{/appointments/save}" th:object="${appointment}" method="post">
+        <input type="hidden" th:field="*{id}" />
 
-    <--Customer Perspective should get implemented Here (Thewjan)-->
+        <div class="mb-3">
+            <label for="customerId" class="form-label">Customer:</label>
+            <select id="customerId" th:field="*{customerId}" class="form-select" required
+                    th:disabled="${loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).CUSTOMER}">
+                <option value="">-- Select Customer --</option> <option th:each="customer : ${customers}"
+                                                                        th:value="${customer.id}"
+                                                                        th:text="${customer.fullName} + ' (' + ${customer.phoneNumber} + ')'">
+            </option>
+            </select>
+            <p th:if="${loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).CUSTOMER}"
+               th:text="${loggedInUser.fullName}" class="form-control-plaintext"></p>
+            <input type="hidden" th:if="${loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).CUSTOMER}"
+                   th:field="*{customerId}" />
+        </div>
+
+        <div class="mb-3">
+            <label for="serviceId" class="form-label">Service:</label>
+            <select id="serviceId" th:field="*{serviceId}" class="form-select" required>
+                <option value="">-- Select Service --</option>
+                <option th:each="service : ${services}"
+                        th:value="${service.id}"
+                        th:text="${service.name} + ' (' + ${service.durationInMinutes} + ' min, ' + ${#numbers.formatCurrency(service.price)} + ')'">
+                </option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="appointmentDateTime" class="form-label">Appointment Date & Time:</label>
+            <input type="datetime-local" id="appointmentDateTime" th:field="*{appointmentDateTime}" class="form-control" required />
+        </div>
 
     <div class="mb-3" th:if="${appointment.id != null and appointment.id > 0 and (loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).STAFF_APPROVED or loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN)}">
         <label for="status" class="form-label">Status:</label>
@@ -33,10 +68,19 @@
         <p class="form-control-plaintext" th:text="${appointment.status ?: 'SCHEDULED'}"></p>
     </div>
 
-    <--Customer Perspective View (Thewjan)-->
+        <div class="mb-3">
+            <label for="notes" class="form-label">Notes:</label>
+            <textarea id="notes" th:field="*{notes}" class="form-control" rows="3"></textarea>
+        </div>
 
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-primary">Save Appointment</button>
+            <a th:href="@{/appointments}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
+
