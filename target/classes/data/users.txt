@@ -1,1 +1,8 @@
-1,admin,admin@salon.local,0000000000,$2a$10$2E7d1xzLmvo.unYSOSc76e41GSSvrTk23guJfMSQnEFKXWzr.srUW,Main Admin,MAIN_ADMIN,ACTIVE
+1,admin,admin@salon.local,0000000000,$2a$10$lKrG3n3EdTtVu3kK2.kif.zsQOC09PpEbLXO4I.o6G.1xgXLfGYEq,Main Admin,MAIN_ADMIN,ACTIVE
+2,dinin1919,saluwadanagedaradinindu@gmail.com,0705011967,$2a$10$aXfQjuZuPjsvy2LVs7IVouUdcxBs7OSdI8wxkzlG4PUPWXy/Doz9a,Dinindu,CUSTOMER,ACTIVE
+3,john123,john123@gmail.com,0725897865,$2a$10$PmYiDnEh.WsSNYPedXRmVOY0fnDRcPsngVLU5HkeDjiBf5B9C6Sua,John Silva,STAFF_APPROVED,ACTIVE
+4,dinin1010,dinindu1919@gmail.com,0756987452,$2a$10$vtDIoewoqh6NWtsRBqg1j.oUQVMPA6gnQ7RIzEka69n3Ci07xpgZ.,S G D V Piyarathna,CUSTOMER,ACTIVE
+5,jenny123,jenny123@hmail.com,07569874456,$2a$10$Dhg9lpyWzk6ttsz8.4yn7ukAEeanpoiCIWTh108jyzllsjkbd3qPa,Jenny Michella,STAFF_APPROVED,ACTIVE
+6,carl123,carl123@gmail.com,0789645213,$2a$10$oDHQ3du4kKqYmShI6QrZ0e6sj757kfkFu5Oj/67tpTgFeHgTHf2MO,Carl Johnson,STAFF_APPROVED,ACTIVE
+7,uma_thath,binuuma3218@gmail.com,0715899745,$2a$10$IL1GDEr1WornMT.fuwRSfO8jqVJuEZB6hQzFXRTZMkeUk3wvSXZuC,Umanda Thathsarani,STAFF_APPROVED,ACTIVE
+8,praveen123,praveen123@example.com,07777777777,$2a$10$8jxOOnY0BGXVYCiILobqFOq79Od6R.cLCGV9jZcXsM0ykASqyFS3i,Praveen,STAFF_PENDING,REJECTED
