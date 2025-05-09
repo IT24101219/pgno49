@@ -60,6 +60,33 @@ public class UserService {
         System.out.println("Deleted user with ID: " + userIdToDelete);
     }
 
+
+    public User updateUserProfile(long userId, String newFullName, String newPhoneNumber) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+
+        if (!StringUtils.hasText(newFullName)) {
+            throw new IllegalArgumentException("Full name cannot be empty.");
+        }
+        if (!StringUtils.hasText(newPhoneNumber)) {
+            throw new IllegalArgumentException("Phone number cannot be empty.");
+        }
+
+        String trimmedPhoneNumber = newPhoneNumber.trim();
+        if (!Objects.equals(user.getPhoneNumber(), trimmedPhoneNumber)) {
+            Optional<User> existingUserWithPhone = userRepository.findByPhoneNumber(trimmedPhoneNumber);
+            if (existingUserWithPhone.isPresent() && existingUserWithPhone.get().getId() != userId) {
+                throw new IllegalArgumentException("Phone number '" + newPhoneNumber + "' is already registered to another user.");
+            }
+            user.setPhoneNumber(trimmedPhoneNumber);
+        }
+
+        user.setFullName(newFullName.trim());
+
+        return userRepository.save(user);
+    }
+
     public void suspendUser(long userIdToSuspend, long adminUserId) {
         User adminUser = userRepository.findById(adminUserId)
                 .orElseThrow(() -> new RuntimeException("Performing admin user not found."));
@@ -77,17 +104,17 @@ public class UserService {
         User userToSuspend = userRepository.findById(userIdToSuspend)
                 .orElseThrow(() -> new RuntimeException("User to suspend not found with ID: " + userIdToSuspend));
 
-        // Cannot suspend the MAIN_ADMIN
+
         if (userToSuspend.getRole() == User.Role.MAIN_ADMIN) {
             throw new RuntimeException("Cannot suspend the MAIN_ADMIN account.");
         }
 
-        // Check if already suspended
+
         if (userToSuspend.getStatus() == User.AccountStatus.SUSPENDED) {
             throw new RuntimeException("User account is already suspended.");
         }
 
-        // Update status and save
+
         userToSuspend.setStatus(User.AccountStatus.SUSPENDED);
         userRepository.save(userToSuspend);
         System.out.println("Suspended user with ID: " + userIdToSuspend);
