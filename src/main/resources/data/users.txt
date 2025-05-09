@@ -1,0 +1,1 @@
+1,admin,admin@salon.local,0000000000,$2a$10$2E7d1xzLmvo.unYSOSc76e41GSSvrTk23guJfMSQnEFKXWzr.srUW,Main Admin,MAIN_ADMIN,ACTIVE
