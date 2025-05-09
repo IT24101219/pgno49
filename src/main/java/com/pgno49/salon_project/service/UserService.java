@@ -22,9 +22,20 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
+    public Optional<User> getUserById(Long id) {
+        if (id == null) return Optional.empty();
+        return userRepository.findById(id);
+    }
+
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public Map<Long, User> getAllUsersMap() {
+        return getAllUsers().stream()
+                .collect(Collectors.toMap(User::getId, user -> user, (existing, replacement) -> existing));
+    }
+
 
     public List<User> getAllActiveCustomers() {
         return userRepository.findAll().stream()
