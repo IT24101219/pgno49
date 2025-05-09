@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointment List</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <style>
+        body { padding-top: 70px; }
+        .action-buttons a, .action-buttons button, .action-buttons form { margin-right: 5px; display: inline-block; }
+        .alert { margin-top: 15px; }
+        .notes-col { max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .filter-buttons .btn { margin-right: 5px; margin-bottom: 10px;}
+    </style>
+</head>
+<body>
+<div th:replace="~{fragments/_navbar :: navbar}"></div>
+
+<div class="container mt-4">
+    <h1 class="mb-4">Appointments</h1>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="mb-3" th:if="${loggedInUser != null and (loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).CUSTOMER or loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).STAFF_APPROVED or loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN)}">
+        <a th:href="@{/appointments/add}" class="btn btn-success">Book New Appointment</a>
+    </div>
+
+    <div class="mb-3 filter-buttons">
+        <a th:href="@{/appointments/list(filter='today')}" class="btn btn-sm" th:classappend="${activeFilter == 'today' ? 'btn-primary' : 'btn-outline-primary'}">Today</a>
+        <a th:href="@{/appointments/list(filter='scheduled')}" class="btn btn-sm" th:classappend="${activeFilter == 'scheduled' ? 'btn-info' : 'btn-outline-info'}">Scheduled</a>
+        <a th:href="@{/appointments/list(filter='completed')}" class="btn btn-sm" th:classappend="${activeFilter == 'completed' ? 'btn-secondary' : 'btn-outline-secondary'}">Completed</a>
+        <a th:href="@{/appointments/list(filter='cancelled')}" class="btn btn-sm" th:classappend="${activeFilter == 'cancelled' ? 'btn-warning' : 'btn-outline-warning'}">Cancelled</a>
+        <a th:href="@{/appointments/list}" class="btn btn-sm btn-light" th:if="${activeFilter != null and !activeFilter.isEmpty()}">Clear Filter</a>
+    </div>
+
+    <h2 th:if="${loggedInUser != null and loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).CUSTOMER}">My Appointments
+        <span th:if="${activeFilter}" th:text="' (' + ${#strings.capitalize(activeFilter)} + ')'" class="fs-5 text-muted"></span>
+    </h2>
+    <h2 th:if="${loggedInUser != null and loggedInUser.role != T(com.pgno49.salon_project.model.User.Role).CUSTOMER}">All Appointments
+        <span th:if="${activeFilter}" th:text="' (' + ${#strings.capitalize(activeFilter)} + ')'" class="fs-5 text-muted"></span>
+    </h2>
+
+    <div th:if="${appointments == null || appointments.isEmpty()}">
+        <p class="text-muted" th:text="${activeFilter != null and !activeFilter.isEmpty() ? 'No ' + activeFilter + ' appointments found.' : 'No appointments found.' }"></p>
+    </div>
+
+    <div th:unless="${appointments == null || appointments.isEmpty()}" class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th th:if="${loggedInUser.role != T(com.pgno49.salon_project.model.User.Role).CUSTOMER}">Customer</th>
+                <th>Service</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th class="notes-col">Notes</th>
+                <th>Actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="appointment : ${appointments}">
+                <td th:text="${appointment.id}">1</td>
+                <td th:if="${loggedInUser.role != T(com.pgno49.salon_project.model.User.Role).CUSTOMER}"
+                    th:text="${userMap != null and userMap[appointment.customerId] != null ? userMap[appointment.customerId].fullName : 'Unknown'}">Customer Name</td>
+                <td th:text="${serviceMap != null and serviceMap[appointment.serviceId] != null ? serviceMap[appointment.serviceId].name : 'Unknown'}">Service Name</td>
+                <td th:text="${appointment.appointmentDateTime != null ? #temporals.format(appointment.appointmentDateTime, 'yyyy-MM-dd HH:mm') : ''}">Date Time</td>
+                <td>
+                        <span th:text="${appointment.status}"
+                              th:classappend="${appointment.status == T(com.pgno49.salon_project.model.Appointment.AppointmentStatus).CANCELLED ? 'text-danger' : (appointment.status == T(com.pgno49.salon_project.model.Appointment.AppointmentStatus).COMPLETED ? 'text-success' : '')}">
+                        </span>
+                </td>
+                <td th:text="${appointment.notes}" class="notes-col" th:title="${appointment.notes}">Notes</td>
+                <td class="action-buttons">
+                    <a th:if="${loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).STAFF_APPROVED or loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN}"
+                       th:href="@{/appointments/edit/{id}(id=${appointment.id})}" class="btn btn-sm btn-warning">Edit</a>
+
+                    <a th:if="${appointment.status == T(com.pgno49.salon_project.model.Appointment.AppointmentStatus).SCHEDULED and loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).CUSTOMER and loggedInUser.id == appointment.customerId}"
+                       th:href="@{/appointments/delete/{id}(id=${appointment.id})}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Are you sure you want to CANCEL this appointment?');">Cancel</a>
+                    <a th:if="${loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).STAFF_APPROVED or loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN}"
+                       th:href="@{/appointments/delete/{id}(id=${appointment.id})}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('Are you sure you want to DELETE this appointment?');">Delete</a>
+
+                    <form th:if="${loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).STAFF_APPROVED or loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN}"
+                          th:action="@{/appointments/updateStatus/{id}(id=${appointment.id})}" method="post" class="mt-1">
+                        <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
+                            <option th:each="stat : ${T(com.pgno49.salon_project.model.Appointment.AppointmentStatus).values()}"
+                                    th:value="${stat}" th:text="${stat}" th:selected="${stat == appointment.status}"></option>
+                        </select>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

@@ -43,6 +43,7 @@ public class AuthService {
         return userRepository.save(newUser);
     }
 
+
     public User registerStaff(String username, String email, String phoneNumber, String password, String fullName, String adminPasscode) {
         if (!requiredAdminPasscode.equals(adminPasscode)) {
             throw new IllegalArgumentException("Invalid Admin Passcode provided for staff registration.");
@@ -63,6 +64,7 @@ public class AuthService {
 
         return userRepository.save(newUser);
     }
+
 
     public User login(String username, String rawPassword) {
         if (!StringUtils.hasText(username) || !StringUtils.hasText(rawPassword)) {
@@ -124,4 +126,5 @@ public class AuthService {
             }
         }
     }
+
 }
