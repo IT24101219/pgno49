@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" th:fragment="navbar">
+    <div class="container-fluid">
+        <a class="navbar-brand" th:href="@{/}">SalonPro</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/}" th:classappend="${currentPage == 'home' ? 'active' : ''}">Home</a>
+                </li>
+                <li class="nav-item" th:if="${loggedInUser != null}">
+                    <a class="nav-link" th:href="@{/appointments}" th:classappend="${currentPage == 'appointments' ? 'active' : ''}">Appointments</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" th:href="@{/services}" th:classappend="${currentPage == 'services' ? 'active' : ''}">Services</a>
+                </li>
+                <li class="nav-item" th:if="${loggedInUser != null and (loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).STAFF_APPROVED or loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN)}">
+                    <a class="nav-link" th:href="@{/customers}" th:classappend="${currentPage == 'customers' ? 'active' : ''}">Customers</a>
+                </li>
+                <li class="nav-item" th:if="${loggedInUser != null and loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN}">
+                    <a class="nav-link" th:href="@{/staff}" th:classappend="${currentPage == 'staff' ? 'active' : ''}">Manage Staff</a>
+                </li>
+                <li class="nav-item" th:if="${loggedInUser != null and (loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).STAFF_APPROVED or loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN)}">
+                    <a class="nav-link" th:href="@{/admin/staff-approval}" th:classappend="${currentPage == 'staff-approval' ? 'active' : ''}">Approve Staff</a>
+                </li>
+                <li class="nav-item" th:if="${loggedInUser != null and loggedInUser.role == T(com.pgno49.salon_project.model.User.Role).MAIN_ADMIN}">
+                    <a class="nav-link" th:href="@{/admin/manage-users}" th:classappend="${currentPage == 'manage-users' ? 'active' : ''}">Manage Users</a>
+                </li>
+            </ul>
+
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown" th:if="${loggedInUser != null}">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarUserDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Welcome, <span th:text="${loggedInUser.fullName ?: loggedInUser.username}">User</span>
+                        (<span th:text="${loggedInUser.role}">Role</span>)
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarUserDropdown">
+                        <li><a class="dropdown-item" th:href="@{/profile}">My Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" th:href="@{/logout}">Logout</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item" th:if="${loggedInUser == null}">
+                    <a class="nav-link" th:href="@{/login}" th:classappend="${currentPage == 'login' ? 'active' : ''}">Login</a>
+                </li>
+                <li class="nav-item" th:if="${loggedInUser == null}">
+                    <a class="nav-link" th:href="@{/signup}" th:classappend="${currentPage == 'signup' ? 'active' : ''}">Sign Up</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+</body>
+</html>
