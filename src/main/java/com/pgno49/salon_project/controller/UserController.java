@@ -29,11 +29,6 @@ public class UserController {
     }
 
 
-    private User getLoggedInUser(HttpSession session) {
-        return (User) session.getAttribute("loggedInUser");
-    }
-
-
 
 
     @GetMapping("")
@@ -99,5 +94,5 @@ public class UserController {
     }
 }
 
-}
+
 
